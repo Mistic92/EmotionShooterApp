@@ -57,6 +57,8 @@ public class MainActivity extends AppCompatActivity implements MainActivityView 
     SurfaceView mSurfaceHolder;
     @BindView(R.id.progressBar)
     ContentLoadingProgressBar mProgressBar;
+    @BindView(R.id.buttonCancelPhoto)
+    Button mButtonCancelPhoto;
     private PhotoModel lastPhoto;
     private RxCamera camera;
 
@@ -167,17 +169,26 @@ public class MainActivity extends AppCompatActivity implements MainActivityView 
         }
     }
 
-    @OnClick({R.id.buttonTakePhoto, R.id.buttonSendPhoto})
+    @OnClick({R.id.buttonTakePhoto, R.id.buttonSendPhoto, R.id.buttonCancelPhoto})
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.buttonTakePhoto:
-//                takePhoto();
                 requestTakePicture();
                 break;
             case R.id.buttonSendPhoto:
                 sendLastPhoto();
                 break;
+            case R.id.buttonCancelPhoto:
+                cancelPhoto();
+                break;
         }
+    }
+
+    private void cancelPhoto() {
+        openCamera();
+        mButtonSendPhoto.setEnabled(false);
+        mButtonCancelPhoto.setEnabled(false);
+        mButtonTakePhoto.setEnabled(true);
     }
 
     private void requestTakePicture() {
@@ -185,23 +196,29 @@ public class MainActivity extends AppCompatActivity implements MainActivityView 
             return;
         }
 
-        camera.request().takePictureRequest(false, () -> Log.d(TAG, "Captured!"),
-                480, 640,
-                ImageFormat.JPEG, true)
+        camera.request().takePictureRequest(false,
+                () -> Log.d(TAG, "Captured!"),
+                1440,
+                1920,
+                ImageFormat.JPEG,
+                false)
                 .subscribe(rxCameraData -> {
                     final byte[] cameraData = rxCameraData.cameraData;
                     final int cameraDataLength = cameraData.length;
                     final Matrix rotateMatrix = rxCameraData.rotateMatrix;
                     presenter.saveAndSendPhotoFile(cameraData, cameraDataLength, rotateMatrix);
                     mButtonSendPhoto.setEnabled(true);
-
+                    mButtonCancelPhoto.setEnabled(true);
+                    mButtonTakePhoto.setEnabled(false);
                 });
     }
 
     private void sendLastPhoto() {
         presenter.sendLastPhoto();
         openCamera();
+        mButtonCancelPhoto.setEnabled(false);
         mButtonSendPhoto.setEnabled(false);
+        mButtonTakePhoto.setEnabled(true);
     }
 
     private boolean checkCamera() {

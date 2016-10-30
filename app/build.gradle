@@ -1,6 +1,7 @@
 apply plugin: 'com.android.application'
 apply plugin: 'me.tatarka.retrolambda'
 apply plugin: 'com.neenbedankt.android-apt'
+apply plugin: 'com.jakewharton.hugo'
 
 def daggerVersion = "2.7"
 def butterknifeVersion = "8.4.0"
@@ -41,11 +42,13 @@ dependencies {
     compile 'com.github.bumptech.glide:glide:3.7.0'
     compile "com.google.dagger:dagger:${daggerVersion}"
     apt "com.google.dagger:dagger-compiler:${daggerVersion}"
+    compile 'com.facebook.stetho:stetho:1.4.1'
+    compile 'com.facebook.stetho:stetho-okhttp3:1.4.1'
+    compile 'com.squareup.okhttp3:okhttp:3.4.1'
 
     compile "com.jakewharton:butterknife:${butterknifeVersion}"
     apt "com.jakewharton:butterknife-compiler:${butterknifeVersion}"
 
-    compile 'com.squareup.retrofit2:retrofit:2.1.0'
 
     compile 'com.ragnarok.rxcamera:lib:0.0.5'
     compile 'io.reactivex:rxandroid:1.2.1'

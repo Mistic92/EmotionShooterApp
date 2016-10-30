@@ -1,4 +1,4 @@
-#ignore properties with api keys 
+#ignore properties with api keys
 gradle.properties
 
 
