@@ -1,17 +1,22 @@
 package pl.lukaszbyjos.emotionshooter.model;
 
-import android.graphics.Matrix;
-
-import java.io.File;
 import java.io.IOException;
 
 import pl.lukaszbyjos.emotionshooter.PhotoModel;
 
 public interface MainActivityModel {
 
-    public PhotoModel createPhotoFile(File storageDir) throws IOException;
+    /**
+     * Create photo file for camera intent
+     * @return PhotoModel with File and filepath
+     * @throws IOException
+     */
+    public PhotoModel createPhotoFile() throws IOException;
 
+    /**
+     * Send photo from given path
+     * @param imagePath
+     */
     public void sendPhoto(final String imagePath);
 
-    public String savePhotoFile(byte[] cameraData, int cameraDataLength, Matrix rotateMatrix);
 }

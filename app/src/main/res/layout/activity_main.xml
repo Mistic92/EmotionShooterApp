@@ -1,66 +1,82 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
+<android.support.design.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/activity_main"
+    android:id="@+id/coordinatorLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="pl.lukaszbyjos.emotionshooter.view.MainActivity">
 
-    <LinearLayout
-        android:id="@+id/actionButtonPanel"
-        style="?attr/buttonBarStyle"
+    <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
-        android:layout_height="100dp"
-        android:layout_alignParentBottom="true"
-        android:orientation="horizontal">
+        android:layout_height="?attr/actionBarSize"
+        android:layout_alignParentTop="true"
+        android:theme="@style/ThemeOverlay.AppCompat.ActionBar">
 
-        <Button
-            android:id="@+id/buttonTakePhoto"
-            style="?attr/buttonBarButtonStyle"
-            android:layout_width="0dp"
+        <android.support.v7.widget.Toolbar
+            android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_weight="2"
-            android:text="TAKE PHOTO"/>
+            android:padding="5dp">
 
-        <Button
-            android:id="@+id/buttonCancelPhoto"
-            style="?attr/buttonBarButtonStyle"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:text="CANCEL"/>
+            <TextView
+                style="@style/toolbarText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Emotion Shooter"
+                />
 
-        <Button
-            android:id="@+id/buttonSendPhoto"
-            style="?attr/buttonBarButtonStyle"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:text="Send photo"/>
-    </LinearLayout>
+            <ImageView
+                android:id="@+id/settings"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_gravity="right"
+                android:layout_marginRight="10dp"
+                android:src="@drawable/ic_settings_white_24dp"/>
+        </android.support.v7.widget.Toolbar>
+    </android.support.design.widget.AppBarLayout>
 
-    <ImageView
-        android:id="@+id/imageHolder"
+
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_above="@id/actionButtonPanel"
-        android:layout_centerInParent="true"/>
+        android:layout_height="wrap_content">
 
-    <SurfaceView
-        android:id="@+id/surfaceHolder"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_above="@id/actionButtonPanel"
-        android:layout_centerInParent="true"/>
+        <LinearLayout
+            android:id="@+id/settingsBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
 
-    <android.support.v4.widget.ContentLoadingProgressBar
-        android:id="@+id/progressBar"
-        style="?android:attr/progressBarStyleLarge"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:visibility="visible"/>
+            <EditText
+                android:id="@+id/serverIpEditText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="left"
+                android:hint="Server ip"
+                />
 
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right|center_horizontal"
+                android:src="@drawable/ic_done_green_24dp"/>
+        </LinearLayout>
 
-</RelativeLayout>
+        <pl.lukaszbyjos.emotionshooter.view.ControlButtonsBar
+            android:id="@+id/controlButtonsBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"/>
+
+        <ImageView
+            android:id="@+id/photoHolder"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_above="@id/controlButtonsBar"
+            android:layout_centerInParent="true"
+            />
+
+    </RelativeLayout>
+
+</android.support.design.widget.CoordinatorLayout>

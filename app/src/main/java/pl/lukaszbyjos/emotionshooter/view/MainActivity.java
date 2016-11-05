@@ -3,64 +3,64 @@ package pl.lukaszbyjos.emotionshooter.view;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.ImageFormat;
-import android.graphics.Matrix;
-import android.graphics.Point;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
+import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.widget.ContentLoadingProgressBar;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.SurfaceView;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.Toast;
 
-import com.ragnarok.rxcamera.RxCamera;
-import com.ragnarok.rxcamera.config.RxCameraConfig;
+import com.bumptech.glide.Glide;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
+
+import java.io.IOException;
 
 import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import hugo.weaving.DebugLog;
 import pl.lukaszbyjos.emotionshooter.AppClass;
 import pl.lukaszbyjos.emotionshooter.PhotoModel;
 import pl.lukaszbyjos.emotionshooter.R;
+import pl.lukaszbyjos.emotionshooter.events.PhotoSendEvent;
+import pl.lukaszbyjos.emotionshooter.events.PhotoSendingEvent;
 import pl.lukaszbyjos.emotionshooter.presenter.MainActivityPresenter;
-import rx.Observable;
-import rx.Subscriber;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Func1;
 
-public class MainActivity extends AppCompatActivity implements MainActivityView {
+public class MainActivity
+        extends AppCompatActivity
+        implements MainActivityView, ControlButtonsBar.ControlButtonsListener {
 
     private static final int REQUEST_IMAGE_CAPTURE = 1;
     private static final String TAG = "em";
     private static final String[] REQUEST_PERMISSIONS = new String[]{
-            Manifest.permission.CAMERA,
             Manifest.permission.WRITE_EXTERNAL_STORAGE
     };
     private static final int REQUEST_PERMISSION_CODE = 233;
     @Inject
     protected MainActivityPresenter presenter;
-    @BindView(R.id.buttonTakePhoto)
-    Button mButtonTakePhoto;
-    @BindView(R.id.buttonSendPhoto)
-    Button mButtonSendPhoto;
-    @BindView(R.id.imageHolder)
+
+    @BindView(R.id.photoHolder)
     ImageView mImageHolder;
-    @BindView(R.id.surfaceHolder)
-    SurfaceView mSurfaceHolder;
-    @BindView(R.id.progressBar)
-    ContentLoadingProgressBar mProgressBar;
-    @BindView(R.id.buttonCancelPhoto)
-    Button mButtonCancelPhoto;
+    @BindView(R.id.coordinatorLayout)
+    CoordinatorLayout mCoordinatorLayout;
+    @BindView(R.id.settings)
+    ImageView mSettings;
+    @BindView(R.id.controlButtonsBar)
+    ControlButtonsBar mControlButtonsBar;
     private PhotoModel lastPhoto;
-    private RxCamera camera;
 
     @Override
     protected void onDestroy() {
@@ -72,7 +72,10 @@ public class MainActivity extends AppCompatActivity implements MainActivityView 
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
-            Log.d(TAG, "onActivityResult: " + lastPhoto.getPhotoPath());
+            Glide.with(this)
+                    .load(lastPhoto.getPhoto())
+                    .into(mImageHolder);
+            mControlButtonsBar.photoTakenSetup();
         }
     }
 
@@ -82,65 +85,76 @@ public class MainActivity extends AppCompatActivity implements MainActivityView 
         setContentView(R.layout.activity_main);
         ((AppClass) getApplication()).getAppComponent().inject(this);
         ButterKnife.bind(this);
+        mControlButtonsBar.setControlButtonsListener(this);
         presenter.bind(this);
-        mProgressBar.hide();
-
+        Glide.with(this)
+                .load(R.drawable.gdg_rzeszow_logo)
+                .crossFade()
+                .into(mImageHolder);
         if (!checkPermission()) {
             requestPermission();
-        } else {
-            openCamera();
         }
 
     }
 
     private void openCamera() {
-        RxCameraConfig config = new RxCameraConfig.Builder()
-                .useBackCamera()
-                .setAutoFocus(true)
-                .setPreferPreviewFrameRate(15, 30)
-                .setPreferPreviewSize(new Point(640, 480), false)
-                .setHandleSurfaceEvent(true)
-                .build();
-        RxCamera.open(this, config).flatMap(new Func1<RxCamera, Observable<RxCamera>>() {
-            @Override
-            public Observable<RxCamera> call(RxCamera rxCamera) {
-                Log.d(TAG, "isopen: " + rxCamera.isOpenCamera() + ", thread: " + Thread.currentThread());
-                camera = rxCamera;
-                return rxCamera.bindSurface(mSurfaceHolder);
-            }
-        }).flatMap(new Func1<RxCamera, Observable<RxCamera>>() {
-            @Override
-            public Observable<RxCamera> call(RxCamera rxCamera) {
-                Log.d(TAG, "isbindsurface: " + rxCamera.isBindSurface() + ", thread: " + Thread.currentThread());
-                return rxCamera.startPreview();
-            }
-        }).observeOn(AndroidSchedulers.mainThread()).subscribe(new Subscriber<RxCamera>() {
-            @Override
-            public void onCompleted() {
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        // Ensure that there's a camera activity to handle the intent
 
+        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+            // Create the File where the photo should go
+            try {
+                lastPhoto = presenter.savePhoto();
+            } catch (IOException ex) {
+                Log.e(TAG, "openCamera: ", ex);
+                // Error occurred while creating the File
             }
-
-            @Override
-            public void onError(Throwable e) {
-                Log.e(TAG, "open camera error: " + e.getMessage());
+            // Continue only if the File was successfully created
+            if (lastPhoto != null) {
+                Uri photoURI = FileProvider.getUriForFile(this,
+                        "com.example.android.fileprovider",
+                        lastPhoto.getPhoto());
+                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+                startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
             }
-
-            @Override
-            public void onNext(final RxCamera rxCamera) {
-                camera = rxCamera;
-                Log.e(TAG, "open camera success: " + camera);
-                Toast.makeText(MainActivity.this, "Now you can tap to focus", Toast.LENGTH_LONG).show();
-            }
-        });
+        }
     }
 
     @Override
-    public void sendingPhotoAction() {
-
+    @Subscribe()
+    @DebugLog
+    public void sendingPhotoAction(PhotoSendingEvent photoSendingEvent) {
+        mControlButtonsBar.sendingPhotoSetup();
     }
 
     @Override
-    public void photoSendAction() {
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    @DebugLog
+    public void photoSendAction(PhotoSendEvent photoSendEvent) {
+        if (photoSendEvent.isSend())
+            mControlButtonsBar.photoSendSetup();
+        else {
+            mControlButtonsBar.photoNotSendSetup();
+            Snackbar.make(mCoordinatorLayout, photoSendEvent.getReason(), Snackbar.LENGTH_LONG).show();
+        }
+        new Handler().postDelayed(() -> {
+            cancelPhoto();
+            mControlButtonsBar.startSetup();
+        }, 2000);
+
+    }
+
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        EventBus.getDefault().register(this);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        EventBus.getDefault().unregister(this);
     }
 
     private boolean checkPermission() {
@@ -160,71 +174,60 @@ public class MainActivity extends AppCompatActivity implements MainActivityView 
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode,
+                                           @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
         if (requestCode == REQUEST_PERMISSION_CODE) {
             if (grantResults.length == 2 && grantResults[0] == PackageManager.PERMISSION_GRANTED
                     && grantResults[1] == PackageManager.PERMISSION_GRANTED) {
-                openCamera();
+
             }
         }
     }
 
-    @OnClick({R.id.buttonTakePhoto, R.id.buttonSendPhoto, R.id.buttonCancelPhoto})
+    @OnClick({R.id.settings})
     public void onClick(View view) {
         switch (view.getId()) {
-            case R.id.buttonTakePhoto:
-                requestTakePicture();
-                break;
-            case R.id.buttonSendPhoto:
-                sendLastPhoto();
-                break;
-            case R.id.buttonCancelPhoto:
-                cancelPhoto();
+
+            case R.id.settings:
+                openSettings();
                 break;
         }
+    }
+
+    private void openSettings() {
+        Intent intent = new Intent(this, PrefsFragment.class);
+        startActivity(intent);
     }
 
     private void cancelPhoto() {
-        openCamera();
-        mButtonSendPhoto.setEnabled(false);
-        mButtonCancelPhoto.setEnabled(false);
-        mButtonTakePhoto.setEnabled(true);
+        lastPhoto = null;
+        presenter.resetLastPhoto();
+        Glide.with(this)
+                .load(R.drawable.gdg_rzeszow_logo)
+                .crossFade()
+                .into(mImageHolder);
     }
 
-    private void requestTakePicture() {
-        if (!checkCamera()) {
-            return;
+    @Override
+    @DebugLog
+    public void onTakePhotoClicked() {
+        if (checkPermission())
+            openCamera();
+        else {
+            requestPermission();
         }
-
-        camera.request().takePictureRequest(false,
-                () -> Log.d(TAG, "Captured!"),
-                1440,
-                1920,
-                ImageFormat.JPEG,
-                false)
-                .subscribe(rxCameraData -> {
-                    final byte[] cameraData = rxCameraData.cameraData;
-                    final int cameraDataLength = cameraData.length;
-                    final Matrix rotateMatrix = rxCameraData.rotateMatrix;
-                    presenter.saveAndSendPhotoFile(cameraData, cameraDataLength, rotateMatrix);
-                    mButtonSendPhoto.setEnabled(true);
-                    mButtonCancelPhoto.setEnabled(true);
-                    mButtonTakePhoto.setEnabled(false);
-                });
     }
 
-    private void sendLastPhoto() {
+    @Override
+    @DebugLog
+    public void onSendPhotoClicked() {
         presenter.sendLastPhoto();
-        openCamera();
-        mButtonCancelPhoto.setEnabled(false);
-        mButtonSendPhoto.setEnabled(false);
-        mButtonTakePhoto.setEnabled(true);
     }
 
-    private boolean checkCamera() {
-        if (camera == null || !camera.isOpenCamera()) {
-            return false;
-        }
-        return true;
+    @Override
+    @DebugLog
+    public void onCancelPhotoClicked() {
+        cancelPhoto();
     }
 }

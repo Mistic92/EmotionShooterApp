@@ -39,6 +39,7 @@ dependencies {
     })
     compile "com.android.support:appcompat-v7:${supportLibVersion}"
     compile "com.android.support:support-v4:${supportLibVersion}"
+    compile "com.android.support:design:${supportLibVersion}"
     compile 'com.github.bumptech.glide:glide:3.7.0'
     compile "com.google.dagger:dagger:${daggerVersion}"
     apt "com.google.dagger:dagger-compiler:${daggerVersion}"
@@ -49,10 +50,11 @@ dependencies {
     compile "com.jakewharton:butterknife:${butterknifeVersion}"
     apt "com.jakewharton:butterknife-compiler:${butterknifeVersion}"
 
+    compile 'org.greenrobot:eventbus:3.0.0'
 
-    compile 'com.ragnarok.rxcamera:lib:0.0.5'
-    compile 'io.reactivex:rxandroid:1.2.1'
-    compile 'io.reactivex:rxjava:1.1.6'
+//    compile 'com.ragnarok.rxcamera:lib:0.0.5'
+//    compile 'io.reactivex:rxandroid:1.2.1'
+//    compile 'io.reactivex:rxjava:1.1.6'
 
     testCompile 'junit:junit:4.12'
 }

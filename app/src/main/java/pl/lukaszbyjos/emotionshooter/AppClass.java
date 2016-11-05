@@ -25,7 +25,7 @@ public class AppClass extends Application {
         super.onCreate();
         Stetho.initializeWithDefaults(this);
         mAppComponent = DaggerAppComponent.builder()
-                .appModule(new AppModule())
+                .appModule(new AppModule(this))
                 .build();
     }
 }

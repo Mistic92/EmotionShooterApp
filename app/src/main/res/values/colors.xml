@@ -6,4 +6,8 @@
     <color name="buttonBackground">#536DFE</color>
     <color name="buttonText">#FF9100</color>
     <color name="white">#FFFFFF</color>
+
+    <color name="cancelRed">#ff1744</color>
+    <color name="inactiveButton">#d1d1d1</color>
+    <color name="greenOk">#64dd17</color>
 </resources>
