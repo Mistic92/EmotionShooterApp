@@ -35,6 +35,7 @@ import hugo.weaving.DebugLog;
 import pl.lukaszbyjos.emotionshooter.AppClass;
 import pl.lukaszbyjos.emotionshooter.PhotoModel;
 import pl.lukaszbyjos.emotionshooter.R;
+import pl.lukaszbyjos.emotionshooter.buttonbar.ControlButtonsBar;
 import pl.lukaszbyjos.emotionshooter.events.PhotoSendEvent;
 import pl.lukaszbyjos.emotionshooter.events.PhotoSendingEvent;
 import pl.lukaszbyjos.emotionshooter.presenter.MainActivityPresenter;
@@ -46,7 +47,8 @@ public class MainActivity
     private static final int REQUEST_IMAGE_CAPTURE = 1;
     private static final String TAG = "em";
     private static final String[] REQUEST_PERMISSIONS = new String[]{
-            Manifest.permission.WRITE_EXTERNAL_STORAGE
+            Manifest.permission.WRITE_EXTERNAL_STORAGE,
+            Manifest.permission.CAMERA
     };
     private static final int REQUEST_PERMISSION_CODE = 233;
     @Inject
@@ -85,6 +87,7 @@ public class MainActivity
         setContentView(R.layout.activity_main);
         ((AppClass) getApplication()).getAppComponent().inject(this);
         ButterKnife.bind(this);
+
         mControlButtonsBar.setControlButtonsListener(this);
         presenter.bind(this);
         Glide.with(this)
@@ -94,7 +97,6 @@ public class MainActivity
         if (!checkPermission()) {
             requestPermission();
         }
-
     }
 
     private void openCamera() {

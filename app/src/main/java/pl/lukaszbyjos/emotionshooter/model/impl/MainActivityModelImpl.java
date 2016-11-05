@@ -47,8 +47,8 @@ public class MainActivityModelImpl implements MainActivityModel {
     }
 
     private void refreshServerIp(){
-        final String url  = mSharedPreferences.getString("server_ip","http://localhost");
-        mHostSelectionInterceptor.setHost(url);
+        final String url  = mSharedPreferences.getString("server_ip","192.168.1.106:8080/api/");
+        mHostSelectionInterceptor.setParameters(url);
     }
 
     @Override
@@ -61,7 +61,6 @@ public class MainActivityModelImpl implements MainActivityModel {
         String photoPath;
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
         String imageFileName = "JPEG_" + timeStamp + "_";
-//        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
         File image = File.createTempFile(
                 imageFileName,  /* prefix */
                 ".jpg",         /* suffix */

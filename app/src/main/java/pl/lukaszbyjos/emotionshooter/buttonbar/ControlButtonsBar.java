@@ -1,6 +1,7 @@
-package pl.lukaszbyjos.emotionshooter.view;
+package pl.lukaszbyjos.emotionshooter.buttonbar;
 
 import android.content.Context;
+import android.support.design.widget.CoordinatorLayout;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.ImageButton;
@@ -14,6 +15,7 @@ import butterknife.OnClick;
 import hugo.weaving.DebugLog;
 import pl.lukaszbyjos.emotionshooter.R;
 
+@CoordinatorLayout.DefaultBehavior(ControlButtonsBarBehavior.class)
 public class ControlButtonsBar extends LinearLayout {
     private static final String TAG = "CBB";
     @BindView(R.id.buttonTakePhoto)
@@ -135,7 +137,7 @@ public class ControlButtonsBar extends LinearLayout {
         mButtonTakePhoto.setEnabled(true);
     }
 
-    interface ControlButtonsListener {
+    public interface ControlButtonsListener {
         void onTakePhotoClicked();
 
         void onSendPhotoClicked();

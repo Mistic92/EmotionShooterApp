@@ -63,20 +63,20 @@
                 android:src="@drawable/ic_done_green_24dp"/>
         </LinearLayout>
 
-        <pl.lukaszbyjos.emotionshooter.view.ControlButtonsBar
-            android:id="@+id/controlButtonsBar"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"/>
-
         <ImageView
             android:id="@+id/photoHolder"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_above="@id/controlButtonsBar"
             android:layout_centerInParent="true"
             />
 
     </RelativeLayout>
+
+    <pl.lukaszbyjos.emotionshooter.buttonbar.ControlButtonsBar
+        android:id="@+id/controlButtonsBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|right|end"
+        />
 
 </android.support.design.widget.CoordinatorLayout>
