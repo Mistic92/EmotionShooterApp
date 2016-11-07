@@ -22,7 +22,7 @@
                 style="@style/toolbarText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Emotion Shooter"
+                android:text="@string/app_name"
                 />
 
             <ImageView
@@ -36,41 +36,13 @@
     </android.support.design.widget.AppBarLayout>
 
 
-    <RelativeLayout
+    <ImageView
+        android:id="@+id/photoHolder"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="match_parent"
+        android:layout_centerInParent="true"
+        />
 
-        <LinearLayout
-            android:id="@+id/settingsBar"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
-
-            <EditText
-                android:id="@+id/serverIpEditText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="left"
-                android:hint="Server ip"
-                />
-
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="right|center_horizontal"
-                android:src="@drawable/ic_done_green_24dp"/>
-        </LinearLayout>
-
-        <ImageView
-            android:id="@+id/photoHolder"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_centerInParent="true"
-            />
-
-    </RelativeLayout>
 
     <pl.lukaszbyjos.emotionshooter.buttonbar.ControlButtonsBar
         android:id="@+id/controlButtonsBar"

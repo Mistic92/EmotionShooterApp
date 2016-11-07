@@ -5,9 +5,10 @@
         android:title="Settings">
 
         <EditTextPreference
+            android:defaultValue="192.168.1.106:8080/api/"
             android:key="server_ip"
-            android:title="Server ip"
             android:summary="Set EmotionShooter server ip"
+            android:title="Server ip"
             />
 
     </PreferenceCategory>

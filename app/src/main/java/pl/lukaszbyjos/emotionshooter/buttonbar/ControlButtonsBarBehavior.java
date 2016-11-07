@@ -24,6 +24,5 @@ public class ControlButtonsBarBehavior extends CoordinatorLayout.Behavior<Contro
         float translationY = Math.min(0, dependency.getTranslationY() - dependency.getHeight());
         child.setTranslationY(translationY);
         return true;
-//        return super.onDependentViewChanged(parent, child, dependency);
     }
 }

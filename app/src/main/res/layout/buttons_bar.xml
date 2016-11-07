@@ -3,10 +3,10 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/actionButtonPanel"
     style="?attr/buttonBarStyle"
-    android:layout_above="@id/settingsBar"
     android:layout_width="match_parent"
     android:layout_height="100dp"
     android:layout_alignParentBottom="true"
+    android:background="@color/white"
     android:orientation="horizontal">
 
     <ImageButton
